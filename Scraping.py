@@ -22,6 +22,7 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
+        "hemispheres": hemisphere(browser),
         "last_modified": dt.datetime.now()
     }
 
@@ -126,6 +127,42 @@ def mars_facts():
 
     return df.to_html()
 
+def hemisphere(browser):
+
+    # 1. Use browser to visit the URL 
+
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    # 2. Create a list to hold the images and titles.
+
+    hemisphere_image_urls = []
+
+    # 3. Write code to retrieve the image urls and titles for each hemisphere.
+
+    #iterate through finding the four images
+    for link in range(4):
+        #add a self-clearing dictionary for each iteration
+        hemisphere = {}
+        
+        #using splinter, find the link for the image and add the text of the link as a title inthe hemisphere dictionary
+        hemisphere['title'] = browser.find_by_css('a.product-item h3')[link].value
+        ##print test
+        #print(hemisphere['title'])
+        
+        ##using splinter, find the link for the image and navigate to the page the link directs you to
+        browser.find_by_css('a.product-item h3')[link].click()
+        
+        ##get the link for the image by searching for "sample" and then store the hypertext reference in the hemisphere dictionary
+        hemisphere['img_url'] = browser.links.find_by_text('Sample')['href']
+        ##print test
+        print(hemisphere['img_url'])
+        
+        hemisphere_image_urls.append(hemisphere)
+
+        browser.back()
+
+    return hemisphere_image_urls
 
 # This last block of code tells Flask that our script is complete and ready for action. 
 # The print statement will print out the results of our scraping to our terminal after executing the code.
